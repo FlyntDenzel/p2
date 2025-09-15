@@ -9,10 +9,35 @@ datasource db {
 }
 
 model User {
-    id              String @id @default(cuid())
-    name            String
-    email           String
-    skillsOffered   String[]  
-    skillsWanted    String[]
-    createdAt       DateTime @default(now())
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  skillsOffered String[]
+  skillsWanted  String[]
+
+  matchesA      Match[]  @relation("UserAMatches")
+  matchesB      Match[]  @relation("UserBMatches")
+
+  createdAt     DateTime @default(now())
+}
+
+model Match {
+  id          String   @id @default(cuid())
+  
+  userA       User     @relation("UserAMatches", fields: [userAId], references: [id])
+  userAId     String
+
+  userB       User     @relation("UserBMatches", fields: [userBId], references: [id])
+  userBId     String
+
+  skillFromA  String
+  skillFromB  String
+  status      MatchStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
